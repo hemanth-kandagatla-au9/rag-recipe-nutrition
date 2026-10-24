@@ -4,8 +4,8 @@
 
 **Scope.** Answers come only from two documents: *Healthy Gut, Healthy You* (FSSAI, 2023: probiotic recipes with per-serving energy/protein/carbs/fat) and *Dietary Guidelines for Indians* (ICMR-NIN, 2024). It does not give medical advice, diet plans for health conditions or allergy-safety guarantees, and does not estimate nutrition for dishes the documents don't cover.
 
-- **Live demo:** _add your hosted URL here_
-- **Repo:** _add your GitHub URL here_
+- **Live demo:** https://shareappio-vfk68d2wobhqjyoa4cfidh.streamlit.app/
+- **Repo:** (https://github.com/hemanth-kandagatla-au9/rag-recipe-nutrition)
 
 ## Status: what is real, and how it was checked
 
