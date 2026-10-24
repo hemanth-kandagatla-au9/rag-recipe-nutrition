@@ -74,7 +74,9 @@ def evaluate_and_log(result: dict) -> dict:
            "answer_preview": result["answer"][:200], "refused": result["refused"],
            "route": result["route"].get("type"), "faithfulness": None, "answer_relevancy": None,
            "context_precision": None, "status": "skipped_refused" if result["refused"] else "ok"}
-    if not result["refused"]:
+    if not result["refused"] and not config.RAGAS_LIVE:
+        rec["status"] = "skipped_live_scoring_off"
+    elif not result["refused"]:
         try:
             rec.update(score_with_ragas(result["question"], result["answer"], result["contexts"]))
         except Exception as e:  # never break the app because of scoring

@@ -60,6 +60,11 @@ def ask(req: AskRequest, background: BackgroundTasks):
         result = _service.ask(req.question)
     except RuntimeError as e:  # e.g. missing GROQ_API_KEY
         raise HTTPException(503, str(e))
+    except Exception as e:
+        from .llm import RATE_LIMIT_MESSAGE, is_rate_limit
+        if is_rate_limit(e):
+            raise HTTPException(429, RATE_LIMIT_MESSAGE)
+        raise
     if req.evaluate and not result["refused"]:
         background.add_task(evaluation.evaluate_and_log, result)
     elif req.evaluate:

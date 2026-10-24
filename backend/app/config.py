@@ -32,7 +32,10 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # llama-3.3-70b-versatile was retired by Groq on 2026-08-16; gpt-oss-120b is its production replacement.
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")        # answers
 GROQ_ROUTER_MODEL = os.getenv("GROQ_ROUTER_MODEL", "openai/gpt-oss-20b")  # cheap router calls
-GROQ_JUDGE_MODEL = os.getenv("GROQ_JUDGE_MODEL", "openai/gpt-oss-120b")   # RAGAS judge
+# The RAGAS judge makes many calls per query, so it uses the smaller model: Groq's free daily token limit is per model,
+# and this keeps scoring from exhausting the model that answers questions (a 429 on 2026-10-24 came from judge traffic).
+GROQ_JUDGE_MODEL = os.getenv("GROQ_JUDGE_MODEL", "openai/gpt-oss-20b")
+RAGAS_LIVE = os.getenv("RAGAS_LIVE", "1") != "0"  # set RAGAS_LIVE=0 to stop per-query scoring (e.g. if the hosted quota runs low)
 
 # Friendly document names used in citations, keyed by a phrase of the file name.
 DOC_NAMES = {

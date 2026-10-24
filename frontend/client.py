@@ -53,7 +53,13 @@ def ask(question: str) -> dict:
         return r.json()
     from backend.app import evaluation
     m = _service()
-    result = m._service.ask(question)
+    try:
+        result = m._service.ask(question)
+    except Exception as e:
+        from backend.app.llm import RATE_LIMIT_MESSAGE, is_rate_limit
+        if is_rate_limit(e):
+            raise RuntimeError(RATE_LIMIT_MESSAGE) from None
+        raise
     if result["refused"]:
         evaluation.evaluate_and_log(result)
     else:

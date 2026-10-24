@@ -29,6 +29,11 @@ Rules:
 HUMAN_PROMPT = "Context:\n{context}\n\nQuestion: {question}\nAnswer:"
 
 
+def normalize_citations(answer: str) -> str:
+    """gpt-oss models write citations as 【1】 or 【1†L3-L5】; turn them into plain [1] so they can be parsed and read."""
+    return re.sub(r"【\s*(\d+)[^】]*】", r"[\1]", answer)
+
+
 def format_context(docs: list[dict]) -> str:
     blocks = []
     for i, d in enumerate(docs, 1):
@@ -89,8 +94,8 @@ class RagService:
     @property
     def llm(self):
         if self._llm is None:
-            from .llm import make_llm
-            self._llm = make_llm()
+            from .llm import make_answer_llm
+            self._llm = make_answer_llm()
         return self._llm
 
     @property
@@ -143,7 +148,7 @@ class RagService:
             def generate(x: dict) -> str:
                 if x["refuse"]:
                     return NOT_FOUND
-                return llm_chain.invoke({"context": x["context"], "question": x["question"]}).strip()
+                return normalize_citations(llm_chain.invoke({"context": x["context"], "question": x["question"]}).strip())
 
             self._chain = RunnableLambda(self.retrieve_stage) | RunnablePassthrough.assign(answer=RunnableLambda(generate))
         return self._chain

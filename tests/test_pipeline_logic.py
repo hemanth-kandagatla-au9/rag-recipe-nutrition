@@ -78,3 +78,30 @@ def test_eval_log_records_refusals_and_survives_scoring_errors(monkeypatch=None)
             assert len(rows) == 2 and {"timestamp", "question", "faithfulness", "answer_relevancy", "context_precision"} <= set(rows[0])
         finally:
             config.EVAL_LOG = old
+
+
+def test_fullwidth_citation_markers_are_normalised_and_parsed():
+    ans = chain.normalize_citations("22 g per serving【2】 and more【1†L3-L5】.")
+    assert ans == "22 g per serving[2] and more[1]."
+    docs = [{"doc": "x", "doc_name": "X", "page": 1, "section": "s1"}, {"doc": "x", "doc_name": "X", "page": 2, "section": "s2"},
+            {"doc": "x", "doc_name": "X", "page": 3, "section": "s3"}]
+    assert [c["pdf_page"] for c in chain.used_citations(ans, docs)] == [1, 2]
+
+
+def test_rate_limit_detection_and_live_scoring_switch():
+    from backend.app import evaluation, llm
+
+    class RateLimitError(Exception):
+        pass
+
+    assert llm.is_rate_limit(RateLimitError("x")) and llm.is_rate_limit(Exception("Error code: 429 - tokens per day"))
+    assert not llm.is_rate_limit(ValueError("something else"))
+    with tempfile.TemporaryDirectory() as d:
+        old_log, old_live = config.EVAL_LOG, config.RAGAS_LIVE
+        config.EVAL_LOG, config.RAGAS_LIVE = Path(d) / "l.jsonl", False
+        try:
+            rec = evaluation.evaluate_and_log({"question": "q?", "answer": "a", "route": {"type": "simple"},
+                                               "contexts": ["c"], "refused": False})
+            assert rec["status"] == "skipped_live_scoring_off"
+        finally:
+            config.EVAL_LOG, config.RAGAS_LIVE = old_log, old_live
