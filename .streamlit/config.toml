@@ -1,0 +1,4 @@
+[server]
+# Streamlit's file watcher imports every transformers submodule to watch it, which logs harmless
+# "No module named torchvision" tracebacks and burns CPU. The app does not need hot reload.
+fileWatcherType = "none"

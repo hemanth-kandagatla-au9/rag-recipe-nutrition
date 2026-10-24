@@ -1,0 +1,28 @@
+# One file for local runs AND hosting (Streamlit Community Cloud reads this). Python 3.12 recommended.
+# CPU-only PyTorch (the default Linux wheel pulls ~2 GB of CUDA libraries we cannot use on free hosting).
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+
+# PDF + chunking
+pypdfium2
+pdfplumber
+numpy
+
+# retrieval
+faiss-cpu
+sentence-transformers>=3.0
+
+# LLM chain (Groq) + evaluation
+langchain-core>=0.3
+langchain-groq>=0.3
+langchain-huggingface>=0.1
+ragas>=0.2,<0.4
+langchain-community>=0.3,<0.4  # ragas 0.3 imports chat_models.vertexai, removed in langchain-community 0.4
+
+# apps
+fastapi
+uvicorn[standard]
+python-multipart
+streamlit
+requests
+python-dotenv

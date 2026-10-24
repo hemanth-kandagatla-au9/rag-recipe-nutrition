@@ -1,0 +1,16 @@
+# secrets
+.env
+.streamlit/secrets.toml
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+# source PDFs stay local (redistribution permission not confirmed)
+data/raw/*
+!data/raw/.gitkeep
+# the built index (data/index/) IS committed so the hosted demo works without the PDFs
+# logs: keep the RAGAS log as evidence, drop the noisy trace
+logs/retrieval_trace.jsonl
+.DS_Store
